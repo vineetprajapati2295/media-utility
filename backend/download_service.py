@@ -23,6 +23,11 @@ class DownloadService:
         """Initialize the download service."""
         self.downloads_dir = DOWNLOADS_DIR
     
+    def _is_youtube_url(self, url: str) -> bool:
+        """Check if URL is from YouTube."""
+        youtube_domains = ['youtube.com', 'youtu.be', 'm.youtube.com', 'www.youtube.com']
+        return any(domain in url.lower() for domain in youtube_domains)
+    
     def validate_url(self, url: str) -> Tuple[bool, Optional[str]]:
         """
         Validate if the URL is supported by yt-dlp.
@@ -42,6 +47,83 @@ class DownloadService:
         if not url.startswith(('http://', 'https://')):
             return False, "URL must start with http:// or https://"
         
+        # For YouTube, use simpler validation and warn about restrictions
+        if self._is_youtube_url(url):
+            return self._validate_youtube_url(url)
+        
+        # For other platforms, use standard validation
+        return self._validate_other_url(url)
+    
+    def _validate_youtube_url(self, url: str) -> Tuple[bool, Optional[str]]:
+        """Validate YouTube URL with special handling."""
+        # Try a simple extraction first with minimal options
+        try:
+            ydl_opts = {
+                'quiet': True,
+                'no_warnings': True,
+                'extract_flat': False,
+                # Minimal options - let yt-dlp handle it
+                'skip_download': True,
+            }
+            
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                info = ydl.extract_info(url, download=False)
+                # If we get here, it worked
+                return True, None
+                
+        except yt_dlp.utils.DownloadError as e:
+            error_msg = str(e)
+            # Check for specific YouTube errors
+            if "Sign in" in error_msg or "bot" in error_msg.lower() or "confirm" in error_msg.lower():
+                return False, "YouTube is currently blocking automated requests. This is a temporary restriction. Please try: 1) Wait 10-15 minutes, 2) Try a different video, or 3) Use a different platform (Vimeo, Dailymotion, etc.)"
+            elif "Private video" in error_msg:
+                return False, "This video is private and cannot be downloaded"
+            elif "Video unavailable" in error_msg or "unavailable" in error_msg.lower():
+                return False, "Video is unavailable or has been removed"
+            elif "Unsupported URL" in error_msg:
+                return False, "This YouTube URL format is not supported"
+            else:
+                # Generic YouTube error
+                return False, f"YouTube extraction failed. YouTube frequently blocks automated tools. Try again later or use a different video platform."
+        
+        except Exception as e:
+            error_msg = str(e)
+            if "bot" in error_msg.lower() or "Sign in" in error_msg:
+                return False, "YouTube is blocking automated requests. Please try again later or use a different platform."
+            return False, f"YouTube validation failed: {error_msg[:150]}"
+    
+    def _validate_other_url(self, url: str) -> Tuple[bool, Optional[str]]:
+        """Validate non-YouTube URLs."""
+        # Check if yt-dlp can extract info (without downloading)
+        try:
+            ydl_opts = {
+                'quiet': True,
+                'no_warnings': True,
+                'extract_flat': False,
+                'skip_download': True,
+            }
+            
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                ydl.extract_info(url, download=False)
+            
+            return True, None
+            
+        except yt_dlp.utils.DownloadError as e:
+            error_msg = str(e)
+            if "Private video" in error_msg:
+                return False, "This video is private and cannot be downloaded"
+            elif "Video unavailable" in error_msg:
+                return False, "Video is unavailable or has been removed"
+            elif "Unsupported URL" in error_msg:
+                return False, "This URL is not supported by this platform"
+            else:
+                return False, f"URL validation failed: {error_msg[:200]}"
+        
+        except Exception as e:
+            return False, f"Error validating URL: {str(e)[:200]}"
+    
+    def _old_validate_url(self, url: str) -> Tuple[bool, Optional[str]]:
+        """Old validation method - kept for reference."""
         # Check if yt-dlp can extract info (without downloading)
         # Try multiple methods to avoid bot detection
         methods = [

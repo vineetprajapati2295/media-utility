@@ -120,6 +120,26 @@ main {
     min-height: 1.25rem;
 }
 
+.platform-note {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background: var(--bg-input);
+    border-radius: 6px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.platform-note p {
+    margin: 0.25rem 0;
+}
+
+.youtube-note {
+    color: var(--warning);
+    font-size: 0.8rem;
+    margin-top: 0.5rem !important;
+}
+
 .btn {
     padding: 0.875rem 1.5rem;
     border: none;
