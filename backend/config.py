@@ -37,15 +37,20 @@ YTDLP_OPTIONS = {
     'outtmpl': str(DOWNLOADS_DIR / '%(title)s.%(ext)s'),  # Output filename template
     'quiet': False,  # Show progress
     'no_warnings': False,
-    # YouTube bot detection bypass
+    # YouTube bot detection bypass - try multiple clients
     'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
     'extractor_args': {
         'youtube': {
-            'player_client': ['android', 'web'],  # Use Android client (less bot detection)
-            'player_skip': ['webpage', 'configs'],
+            # Try ios client first (most reliable), then android, then web
+            'player_client': ['ios', 'android', 'web'],
+            'player_skip': ['webpage'],
         }
     },
-    # Additional options to avoid bot detection
+    # Retry options
+    'retries': 5,
+    'fragment_retries': 5,
+    'file_access_retries': 3,
+    # Additional options
     'no_check_certificate': False,
     'prefer_insecure': False,
     'extract_flat': False,

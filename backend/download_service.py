@@ -48,17 +48,18 @@ class DownloadService:
                 'quiet': True,
                 'no_warnings': True,
                 'extract_flat': False,  # Need full extraction to check properly
-                # YouTube bot detection bypass
+                # YouTube bot detection bypass - try ios first (most reliable)
                 'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
                 'extractor_args': {
                     'youtube': {
-                        'player_client': ['android', 'web'],
-                        'player_skip': ['webpage', 'configs'],
+                        'player_client': ['ios', 'android', 'web'],  # Try ios first
+                        'player_skip': ['webpage'],
                     }
                 },
                 # Retry options
-                'retries': 3,
-                'fragment_retries': 3,
+                'retries': 5,
+                'fragment_retries': 5,
+                'file_access_retries': 3,
             }
             
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -106,16 +107,17 @@ class DownloadService:
         ydl_opts = {
             'quiet': True,
             'no_warnings': True,
-            # YouTube bot detection bypass
+            # YouTube bot detection bypass - try ios first (most reliable)
             'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
             'extractor_args': {
                 'youtube': {
-                    'player_client': ['android', 'web'],
-                    'player_skip': ['webpage', 'configs'],
+                    'player_client': ['ios', 'android', 'web'],  # Try ios first
+                    'player_skip': ['webpage'],
                 }
             },
-            'retries': 3,
-            'fragment_retries': 3,
+            'retries': 5,
+            'fragment_retries': 5,
+            'file_access_retries': 3,
         }
         
         try:
