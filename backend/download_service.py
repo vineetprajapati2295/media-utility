@@ -95,13 +95,29 @@ class DownloadService:
         last_error = None
         for method_idx, ydl_opts in enumerate(methods):
             try:
-            
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                ydl.extract_info(url, download=False)
-            
-            return True, None
-            
-        except yt_dlp.utils.DownloadError as e:
+                with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                    ydl.extract_info(url, download=False)
+                
+                # Success! Return immediately
+                return True, None
+                
+            except yt_dlp.utils.DownloadError as e:
+                last_error = e
+                # If this is the last method, we'll handle the error below
+                if method_idx < len(methods) - 1:
+                    # Try next method
+                    continue
+                # Otherwise, fall through to error handling
+                break
+            except Exception as e:
+                last_error = e
+                if method_idx < len(methods) - 1:
+                    continue
+                break
+        
+        # All methods failed, return error
+        if last_error:
+            error_msg = str(last_error)
             error_msg = str(e)
             # Handle YouTube bot detection errors
             if "Sign in to confirm" in error_msg or "bot" in error_msg.lower():
