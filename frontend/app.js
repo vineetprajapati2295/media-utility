@@ -60,14 +60,18 @@ function setupEventListeners() {
 
 async function checkServerHealth() {
     try {
-        const response = await fetch(`${API_BASE_URL}/health`);
+        console.log('Checking server health at:', API_BASE_URL.replace('/api', '/api/health'));
+        const response = await fetch(`${API_BASE_URL.replace('/api', '/api/health')}`);
         const data = await response.json();
         if (data.status === 'healthy') {
-            console.log('Server is online');
+            console.log('✅ Server is online');
+        } else {
+            console.warn('Server health check returned:', data);
         }
     } catch (error) {
-        console.error('Server health check failed:', error);
-        showError('Cannot connect to server. Make sure the backend is running.');
+        console.error('❌ Server health check failed:', error);
+        console.error('API Base URL was:', API_BASE_URL);
+        // Don't show error to user on page load, just log it
     }
 }
 
@@ -92,6 +96,9 @@ async function handleValidate() {
     hideVideoInfo();
 
     try {
+        console.log('Validating URL:', url);
+        console.log('API Base URL:', API_BASE_URL);
+        
         const response = await fetch(`${API_BASE_URL}/validate`, {
             method: 'POST',
             headers: {
@@ -100,7 +107,16 @@ async function handleValidate() {
             body: JSON.stringify({ url }),
         });
 
+        console.log('Response status:', response.status);
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Error response:', errorText);
+            throw new Error(`Server error: ${response.status} - ${errorText}`);
+        }
+
         const data = await response.json();
+        console.log('Response data:', data);
 
         if (data.valid) {
             currentVideoInfo = data.video_info;
@@ -114,7 +130,13 @@ async function handleValidate() {
         }
     } catch (error) {
         console.error('Validation error:', error);
-        showUrlError('Failed to validate URL. Check your connection.');
+        let errorMsg = 'Failed to validate URL. ';
+        if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+            errorMsg += 'Cannot connect to server. Make sure the backend is running and the API URL is correct.';
+        } else {
+            errorMsg += error.message;
+        }
+        showUrlError(errorMsg);
         downloadBtn.disabled = true;
     } finally {
         validateBtn.disabled = false;

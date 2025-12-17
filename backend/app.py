@@ -36,7 +36,8 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = SECRET_KEY
 
 # Enable CORS (Cross-Origin Resource Sharing)
-CORS(app)
+# Allow all origins in production (since frontend is served from same origin)
+CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 # Initialize download service
 download_service = DownloadService()
