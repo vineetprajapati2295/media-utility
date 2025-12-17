@@ -1,17 +1,18 @@
 // Media Utility Platform - Frontend JavaScript
 // Handles all UI interactions and API communication
 
-// Load config first
-let API_BASE_URL = 'http://127.0.0.1:5000/api';
+// API Base URL - will be set by config.js or use default
+// Don't redeclare if config.js already set it
+let API_BASE_URL;
 
-// Use config if available, otherwise use default
 if (typeof window !== 'undefined' && window.API_BASE_URL) {
+    // Use value from config.js
     API_BASE_URL = window.API_BASE_URL;
 } else {
-    // Fallback: auto-detect
+    // Fallback: auto-detect if config.js didn't load
     const isDev = window.location.hostname === 'localhost' || 
                   window.location.hostname === '127.0.0.1';
-    API_BASE_URL = isDev ? 'http://127.0.0.1:5000/api' : '/api';
+    API_BASE_URL = isDev ? 'http://127.0.0.1:5000/api' : window.location.origin + '/api';
 }
 
 // DOM Elements
