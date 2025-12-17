@@ -43,24 +43,58 @@ class DownloadService:
             return False, "URL must start with http:// or https://"
         
         # Check if yt-dlp can extract info (without downloading)
-        try:
-            ydl_opts = {
+        # Try multiple methods to avoid bot detection
+        methods = [
+            {
                 'quiet': True,
                 'no_warnings': True,
-                'extract_flat': False,  # Need full extraction to check properly
-                # YouTube bot detection bypass - try ios first (most reliable)
+                'extract_flat': False,
+                'user_agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1',
+                'extractor_args': {
+                    'youtube': {
+                        'player_client': ['mweb'],  # Mobile web - most reliable
+                        'player_skip': [],
+                    }
+                },
+                'http_headers': {
+                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                    'Accept-Language': 'en-us,en;q=0.5',
+                },
+                'retries': 10,
+                'fragment_retries': 10,
+            },
+            {
+                'quiet': True,
+                'no_warnings': True,
+                'extract_flat': False,
                 'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
                 'extractor_args': {
                     'youtube': {
-                        'player_client': ['ios', 'android', 'web'],  # Try ios first
-                        'player_skip': ['webpage'],
+                        'player_client': ['ios'],
+                        'player_skip': [],
                     }
                 },
-                # Retry options
                 'retries': 5,
                 'fragment_retries': 5,
-                'file_access_retries': 3,
+            },
+            {
+                'quiet': True,
+                'no_warnings': True,
+                'extract_flat': False,
+                'extractor_args': {
+                    'youtube': {
+                        'player_client': ['android'],
+                        'player_skip': [],
+                    }
+                },
+                'retries': 3,
+                'fragment_retries': 3,
             }
+        ]
+        
+        last_error = None
+        for method_idx, ydl_opts in enumerate(methods):
+            try:
             
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 ydl.extract_info(url, download=False)

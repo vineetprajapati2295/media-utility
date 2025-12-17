@@ -37,19 +37,26 @@ YTDLP_OPTIONS = {
     'outtmpl': str(DOWNLOADS_DIR / '%(title)s.%(ext)s'),  # Output filename template
     'quiet': False,  # Show progress
     'no_warnings': False,
-    # YouTube bot detection bypass - try multiple clients
-    'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    # YouTube bot detection bypass - try mweb (mobile web) first, most reliable
+    'user_agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1',
     'extractor_args': {
         'youtube': {
-            # Try ios client first (most reliable), then android, then web
-            'player_client': ['ios', 'android', 'web'],
-            'player_skip': ['webpage'],
+            # Try mweb (mobile web) first - most reliable for avoiding bot detection
+            'player_client': ['mweb', 'ios', 'android', 'web'],
+            'player_skip': [],
         }
     },
+    # Additional headers to look more legitimate
+    'http_headers': {
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Language': 'en-us,en;q=0.5',
+        'Accept-Encoding': 'gzip, deflate',
+        'Connection': 'keep-alive',
+    },
     # Retry options
-    'retries': 5,
-    'fragment_retries': 5,
-    'file_access_retries': 3,
+    'retries': 10,
+    'fragment_retries': 10,
+    'file_access_retries': 5,
     # Additional options
     'no_check_certificate': False,
     'prefer_insecure': False,
