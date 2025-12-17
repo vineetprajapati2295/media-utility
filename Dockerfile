@@ -2,10 +2,13 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install system dependencies
+# Install system dependencies (FFmpeg required for merging video+audio)
 RUN apt-get update && apt-get install -y \
     ffmpeg \
     && rm -rf /var/lib/apt/lists/*
+
+# Verify FFmpeg is installed
+RUN ffmpeg -version || echo "FFmpeg installation check"
 
 # Copy requirements
 COPY requirements.txt .

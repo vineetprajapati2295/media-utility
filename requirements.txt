@@ -8,6 +8,10 @@ flask-cors==4.0.0
 # Media Processing - Keep updated for YouTube fixes
 yt-dlp>=2024.1.1
 
+# FFmpeg is required for merging video+audio streams (Instagram, Twitter, etc.)
+# Install system-wide: sudo apt install ffmpeg (Linux) or brew install ffmpeg (Mac)
+# On Render: Add to build command or use Docker image with FFmpeg
+
 # Utilities
 python-dotenv==1.0.0
 

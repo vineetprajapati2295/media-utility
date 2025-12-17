@@ -28,6 +28,16 @@ class DownloadService:
         youtube_domains = ['youtube.com', 'youtu.be', 'm.youtube.com', 'www.youtube.com']
         return any(domain in url.lower() for domain in youtube_domains)
     
+    def _is_instagram_url(self, url: str) -> bool:
+        """Check if URL is from Instagram."""
+        instagram_domains = ['instagram.com', 'www.instagram.com']
+        return any(domain in url.lower() for domain in instagram_domains)
+    
+    def _is_twitter_url(self, url: str) -> bool:
+        """Check if URL is from Twitter/X."""
+        twitter_domains = ['twitter.com', 'x.com', 'www.twitter.com', 'www.x.com']
+        return any(domain in url.lower() for domain in twitter_domains)
+    
     def validate_url(self, url: str) -> Tuple[bool, Optional[str]]:
         """
         Validate if the URL is supported by yt-dlp.
