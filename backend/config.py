@@ -33,10 +33,18 @@ ALLOWED_DOMAINS = os.getenv('ALLOWED_DOMAINS', '').split(',') if os.getenv('ALLO
 
 # yt-dlp Options
 YTDLP_OPTIONS = {
-    'format': 'best',  # Best quality by default
+    # Use best video+audio or best (will merge if needed for Instagram, Twitter, etc.)
+    'format': 'bestvideo+bestaudio/best',  # Merge video and audio for platforms like Instagram
     'outtmpl': str(DOWNLOADS_DIR / '%(title)s.%(ext)s'),  # Output filename template
     'quiet': False,  # Show progress
     'no_warnings': False,
+    # Post-processors to merge video and audio when separate
+    'postprocessors': [{
+        'key': 'FFmpegVideoConvertor',
+        'preferedformat': 'mp4',
+    }],
+    # Merge video and audio if separate streams
+    'merge_output_format': 'mp4',
     # YouTube bot detection bypass - try mweb (mobile web) first, most reliable
     'user_agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1',
     'extractor_args': {
