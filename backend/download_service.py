@@ -47,7 +47,18 @@ class DownloadService:
             ydl_opts = {
                 'quiet': True,
                 'no_warnings': True,
-                'extract_flat': True,  # Don't download, just check
+                'extract_flat': False,  # Need full extraction to check properly
+                # YouTube bot detection bypass
+                'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'extractor_args': {
+                    'youtube': {
+                        'player_client': ['android', 'web'],
+                        'player_skip': ['webpage', 'configs'],
+                    }
+                },
+                # Retry options
+                'retries': 3,
+                'fragment_retries': 3,
             }
             
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -57,17 +68,30 @@ class DownloadService:
             
         except yt_dlp.utils.DownloadError as e:
             error_msg = str(e)
-            if "Private video" in error_msg:
+            # Handle YouTube bot detection errors
+            if "Sign in to confirm" in error_msg or "bot" in error_msg.lower():
+                return False, "YouTube is blocking automated requests. Please try again in a few minutes or use a different video."
+            elif "Private video" in error_msg:
                 return False, "This video is private and cannot be downloaded"
             elif "Video unavailable" in error_msg:
                 return False, "Video is unavailable or has been removed"
             elif "Unsupported URL" in error_msg:
                 return False, "This URL is not supported"
             else:
-                return False, f"URL validation failed: {error_msg}"
+                # Return a cleaner error message
+                if "ERROR:" in error_msg:
+                    # Extract just the error part
+                    error_part = error_msg.split("ERROR:")[-1].strip()
+                    if len(error_part) > 200:
+                        error_part = error_part[:200] + "..."
+                    return False, f"URL validation failed: {error_part}"
+                return False, f"URL validation failed: {error_msg[:200]}"
         
         except Exception as e:
-            return False, f"Error validating URL: {str(e)}"
+            error_msg = str(e)
+            if "bot" in error_msg.lower() or "Sign in" in error_msg:
+                return False, "YouTube is blocking automated requests. Please try again later."
+            return False, f"Error validating URL: {error_msg[:200]}"
     
     def get_video_info(self, url: str) -> Dict:
         """
@@ -82,6 +106,16 @@ class DownloadService:
         ydl_opts = {
             'quiet': True,
             'no_warnings': True,
+            # YouTube bot detection bypass
+            'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'extractor_args': {
+                'youtube': {
+                    'player_client': ['android', 'web'],
+                    'player_skip': ['webpage', 'configs'],
+                }
+            },
+            'retries': 3,
+            'fragment_retries': 3,
         }
         
         try:
@@ -101,7 +135,10 @@ class DownloadService:
                 return video_info
                 
         except Exception as e:
-            raise Exception(f"Failed to get video info: {str(e)}")
+            error_msg = str(e)
+            if "bot" in error_msg.lower() or "Sign in" in error_msg:
+                raise Exception("YouTube is blocking automated requests. Please try again in a few minutes.")
+            raise Exception(f"Failed to get video info: {error_msg[:200]}")
     
     def _extract_formats(self, info: Dict) -> list:
         """

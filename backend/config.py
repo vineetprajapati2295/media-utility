@@ -37,6 +37,18 @@ YTDLP_OPTIONS = {
     'outtmpl': str(DOWNLOADS_DIR / '%(title)s.%(ext)s'),  # Output filename template
     'quiet': False,  # Show progress
     'no_warnings': False,
+    # YouTube bot detection bypass
+    'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    'extractor_args': {
+        'youtube': {
+            'player_client': ['android', 'web'],  # Use Android client (less bot detection)
+            'player_skip': ['webpage', 'configs'],
+        }
+    },
+    # Additional options to avoid bot detection
+    'no_check_certificate': False,
+    'prefer_insecure': False,
+    'extract_flat': False,
 }
 
 # Create downloads directory if it doesn't exist
