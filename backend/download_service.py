@@ -347,11 +347,20 @@ class DownloadService:
                 }],
             })
         elif format_id:
-            # Specific format
-            ydl_opts['format'] = format_id
+            # Specific format - but ensure audio is included for platforms like Instagram
+            if self._is_instagram_url(url):
+                # Instagram needs video+audio merge
+                ydl_opts['format'] = f'{format_id}+bestaudio/best'
+            else:
+                ydl_opts['format'] = format_id
         else:
-            # Best quality (default)
-            ydl_opts['format'] = 'best'
+            # Best quality with audio merge for platforms that need it
+            if self._is_instagram_url(url) or self._is_twitter_url(url):
+                # Instagram and Twitter often have separate streams
+                ydl_opts['format'] = 'bestvideo+bestaudio/best'
+            else:
+                # Default: try best with audio, fallback to best
+                ydl_opts['format'] = 'bestvideo+bestaudio/best'
         
         # Progress hook to track download
         download_info = {'status': 'downloading', 'progress': 0}
@@ -386,6 +395,14 @@ class DownloadService:
                     mp3_file = self.downloads_dir / f"{base_name}.mp3"
                     if mp3_file.exists():
                         filename = str(mp3_file)
+                
+                # For Instagram/Twitter: Check if merged file exists (FFmpeg creates it)
+                if self._is_instagram_url(url) or self._is_twitter_url(url):
+                    # FFmpeg merges to .mp4, check for that
+                    base_name = Path(filename).stem
+                    merged_file = self.downloads_dir / f"{base_name}.mp4"
+                    if merged_file.exists():
+                        filename = str(merged_file)
                 
                 # Check file size
                 file_path = Path(filename)
