@@ -118,7 +118,6 @@ class DownloadService:
         # All methods failed, return error
         if last_error:
             error_msg = str(last_error)
-            error_msg = str(e)
             # Handle YouTube bot detection errors
             if "Sign in to confirm" in error_msg or "bot" in error_msg.lower():
                 return False, "YouTube is blocking automated requests. Please try again in a few minutes or use a different video."
@@ -138,11 +137,7 @@ class DownloadService:
                     return False, f"URL validation failed: {error_part}"
                 return False, f"URL validation failed: {error_msg[:200]}"
         
-        except Exception as e:
-            error_msg = str(e)
-            if "bot" in error_msg.lower() or "Sign in" in error_msg:
-                return False, "YouTube is blocking automated requests. Please try again later."
-            return False, f"Error validating URL: {error_msg[:200]}"
+        return False, "Failed to validate URL after trying multiple methods"
     
     def get_video_info(self, url: str) -> Dict:
         """
