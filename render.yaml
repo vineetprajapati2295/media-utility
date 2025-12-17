@@ -1,0 +1,23 @@
+# Render.com deployment configuration
+# Deploy for free at: https://render.com
+
+services:
+  - type: web
+    name: media-utility-backend
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn -c gunicorn_config.py backend.app:app
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: FLASK_DEBUG
+        value: False
+      - key: SECRET_KEY
+        generateValue: true
+      - key: PORT
+        value: 5000
+      - key: MAX_REQUESTS_PER_HOUR
+        value: 10
+      - key: MAX_DOWNLOAD_SIZE_MB
+        value: 500
+

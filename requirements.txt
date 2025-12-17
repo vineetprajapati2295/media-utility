@@ -1,0 +1,16 @@
+# Python Dependencies for Media Utility Platform
+# Install with: pip install -r requirements.txt
+
+# Web Framework
+flask==3.0.0
+flask-cors==4.0.0
+
+# Media Processing
+yt-dlp>=2023.12.30
+
+# Utilities
+python-dotenv==1.0.0
+
+# Production Server (required for deployment)
+gunicorn>=21.2.0
+

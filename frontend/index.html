@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Utility - Download & Convert</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 class="logo">Media Utility</h1>
+            <p class="tagline">Download & Convert Media Content</p>
+        </header>
+
+        <main>
+            <!-- Top Banner Ad -->
+            <div class="ad-container ad-top" data-ad-type="custom" data-ad-index="0">
+                <!-- Ad will be loaded by ads.js -->
+            </div>
+
+            <div class="card">
+                <div class="input-section">
+                    <label for="url-input">Enter Media URL</label>
+                    <div class="input-group">
+                        <input 
+                            type="text" 
+                            id="url-input" 
+                            placeholder="https://..."
+                            autocomplete="off"
+                        >
+                        <button id="validate-btn" class="btn btn-secondary">Validate</button>
+                    </div>
+                    <div id="url-error" class="error-message"></div>
+                </div>
+
+                <div id="video-info" class="video-info hidden">
+                    <div class="video-preview">
+                        <img id="video-thumbnail" src="" alt="Video thumbnail">
+                        <div class="video-details">
+                            <h3 id="video-title"></h3>
+                            <p id="video-meta"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="options-section">
+                    <div class="option-group">
+                        <label>Download Type</label>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="download-type" value="video" checked>
+                                <span>Video</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="download-type" value="audio">
+                                <span>Audio Only</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div id="format-selector" class="option-group">
+                        <label for="format-select">Quality</label>
+                        <select id="format-select">
+                            <option value="best">Best Quality</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="action-section">
+                    <button id="download-btn" class="btn btn-primary" disabled>Download</button>
+                </div>
+
+                <div id="status-section" class="status-section hidden">
+                    <div id="status-message" class="status-message"></div>
+                    <div id="progress-bar" class="progress-bar hidden">
+                        <div id="progress-fill" class="progress-fill"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="legal-notice">
+                <p><strong>Legal Notice:</strong> This tool is for personal and educational use only. Users are responsible for ensuring they have the right to download content. Do not download copyrighted material without permission.</p>
+            </div>
+
+            <!-- Bottom Banner Ad -->
+            <div class="ad-container ad-bottom" data-ad-type="custom" data-ad-index="0">
+                <!-- Ad will be loaded by ads.js -->
+            </div>
+
+            <!-- Sidebar Ad (for larger screens) -->
+            <div class="ad-container ad-sidebar" data-ad-type="custom" data-ad-index="1" style="display: none;">
+                <!-- Ad will be loaded by ads.js -->
+            </div>
+        </main>
+
+        <footer>
+            <div class="monetization-section">
+                <p>Support this project:</p>
+                <div class="support-links">
+                    <a href="https://www.buymeacoffee.com" target="_blank" rel="noopener" class="support-link">☕ Buy Me a Coffee</a>
+                    <a href="#" id="affiliate-link" class="support-link">🛠️ Recommended Tools</a>
+                    <a href="#" id="crypto-link" class="support-link">₿ Crypto Donation</a>
+                </div>
+            </div>
+            <p class="copyright">&copy; 2024 Media Utility. Educational use only.</p>
+        </footer>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="ads.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

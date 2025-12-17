@@ -1,0 +1,18 @@
+# Netlify configuration (if deploying frontend separately)
+# This is for frontend-only deployment on Netlify
+
+[build]
+  publish = "frontend"
+  command = "echo 'Frontend only - no build needed'"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Headers for CORS (if needed)
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+
